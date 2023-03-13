@@ -43,7 +43,7 @@ public class Util {
             props.load(in);
             return props;
         } catch (IOException | URISyntaxException e) {
-            throw new IOException("Database config file not found", e);
+            throw new IOException("Ошибка база данных отсутствует", e);
         }
     }
 }
