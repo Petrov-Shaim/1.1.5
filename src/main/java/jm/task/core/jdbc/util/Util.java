@@ -39,7 +39,7 @@ public class Util {
 
     private static Properties getProps() throws IOException {
         Properties props = new Properties();
-        try (InputStream in = Files.newInputStream(Paths.get(Util.class.getResource("/database.properties").toURI()))) {
+        try (InputStream in = Files.newInputStream(Paths.get(Util.class.getResource("/db.properties").toURI()))) {
             props.load(in);
             return props;
         } catch (IOException | URISyntaxException e) {
