@@ -16,17 +16,17 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void createUsersTable() {
-        try (Statement statement = conn.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS users " +
-                    "(id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), last_name VARCHAR(255), age INT)");
+        try (PreparedStatement preparedStatement = conn.prepareStatement("CREATE TABLE IF NOT EXISTS users " +
+                "(id BIGINT PRIMARY KEY AUTO_INCREMENT, name VARCHAR(255), last_name VARCHAR(255), age INT)")) {
+            preparedStatement.execute();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     public void dropUsersTable() {
-        try (Statement statement = conn.createStatement()) {
-            statement.executeUpdate("DROP TABLE IF EXISTS users");
+        try (PreparedStatement preparedStatement = conn.prepareStatement("DROP TABLE IF EXISTS users")) {
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -70,8 +70,8 @@ public class UserDaoJDBCImpl implements UserDao {
     }
 
     public void cleanUsersTable() {
-        try (Statement statement = conn.createStatement()) {
-            statement.executeUpdate("TRUNCATE TABLE users");
+        try (PreparedStatement preparedStatement = conn.prepareStatement("TRUNCATE TABLE users")) {
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
