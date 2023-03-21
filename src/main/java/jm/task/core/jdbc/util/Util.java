@@ -1,49 +1,48 @@
 package jm.task.core.jdbc.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import jm.task.core.jdbc.model.User;
+import org.hibernate.HibernateException;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
+import org.hibernate.service.ServiceRegistry;
+
 import java.util.Properties;
 
 public class Util {
-    private static Connection conn = null;
-    private static Util instance = null;
+    private static SessionFactory sessionFactory;
+    public static SessionFactory getConnection() {
+        if (sessionFactory == null) {
+            try {
+                Configuration configuration = new Configuration();
 
-    private Util() {
-        try {
-            if (null == conn || conn.isClosed()) {
-                Properties props = getProps();
-                conn = DriverManager
-                        .getConnection(props.getProperty("db.url"), props.getProperty("db.username"), props.getProperty("db.password"));
+                // Hibernate settings equivalent to hibernate.cfg.xml's properties
+                Properties settings = new Properties();
+                settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
+                settings.put(Environment.URL, "jdbc:mysql://localhost:3306/lol?useSSL=false");
+                settings.put(Environment.USER, "bestuser");
+                settings.put(Environment.PASS, "bestuser");
+                settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL5Dialect");
+
+                settings.put(Environment.SHOW_SQL, "true");
+
+                settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
+
+                settings.put(Environment.HBM2DDL_AUTO, "");
+
+                configuration.setProperties(settings);
+
+                configuration.addAnnotatedClass(User.class);
+
+                ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                        .applySettings(configuration.getProperties()).build();
+
+                sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
         }
-    }
-
-    public static Util getInstance() {
-        if (null == instance) {
-            instance = new Util();
-        }
-        return instance;
-    }
-
-    public Connection getConnection() {
-        return conn;
-    }
-
-    private static Properties getProps() throws IOException {
-        Properties props = new Properties();
-        try (InputStream in = Files.newInputStream(Paths.get(Util.class.getResource("/db.properties").toURI()))) {
-            props.load(in);
-            return props;
-        } catch (IOException | URISyntaxException e) {
-            throw new IOException("Ошибка база данных отсутствует", e);
-        }
+        return sessionFactory;
     }
 }
